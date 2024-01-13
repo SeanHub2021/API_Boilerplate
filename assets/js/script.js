@@ -3,6 +3,39 @@ const API_URL = "https://ci-jshint.herokuapp.com/api";
 const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal"));
 
 document.getElementById("status").addEventListener("click", e => getStatus(e));
+document.getElementById("submit").addEventListener("click", e => postForm(e)); //get the "submit" element from the html,
+
+//The Post function
+async function postForm(e) { //function activates upon "e" (the event, from the event listener)?
+    const form = new FormData(document.getElementById("checksform")); //new const named "form", check the form element from html "checksform"
+
+    //for (let entry of form.entries()) {
+    //    console.log(entry); //use this to check in the console if the front end form is working, then replace to send to the API
+    //}
+    
+    //then, we paste the "post" instructions from the Usage Instructions
+    const response = await fetch(API_URL, { //we add the 'await', and change the url to the Const for the URL
+        method: "POST",
+        headers: {
+                    "Authorization": API_KEY,
+                 },
+                 body: form, //using the const "form" from earlier, we then send the form info to the API. We know the form content matches the API documentations fields, from when we console.log'd in the previous function
+        })
+    
+    const data = await response.json(); //create the new constant "data", await response(from the fetch statement earlier) and parse it as json first before adding to "data"
+    
+    function displayErrors {
+        
+    }
+
+    if (response.ok) { //check if the response is ok (http status code 200) ["ok" is code to check this]
+        console.log(data); //if okay, log the data to console
+        else {
+            throw new Error(data.error); //if not, "throw" an error message with the error from the api
+        }
+    }
+}
+
 
 //The getStatus function
 //1. Make a GET request to the API URL with the API key
@@ -17,6 +50,24 @@ async function getStatus(e) {
     const data = await response.json(); //when the response comes back, we convert it to json
 
     if (response.ok) { //if the okay signal of 200 is returned, the response property = true, so we can use response.ok to check if the response was okay
-        console.log(data.expiry) // and then print the response!
+        //console.log(data.expiry) // and then print the response!
+        displayStatus(data);
+    } else {
+        throw new Error(data.error); //in the api documentation there is an error message for "error", here if the signal of "okay" is not returned, we return the data for "error"
     }
 }
+
+function displayStatus(data) {
+
+    let heading = "API Key Status"; // Define a title for the results modal element (from the HTML)
+    let results = `<div>Your key is valid until<div>`; // Create a message about the key's validity
+    results += `<div class="key-status">${data.expiry}</div>`; // append the previous "results" variable with a new HTML <div> element with the class "key-status" and the value of data.expiry
+
+    document.getElementById("resultsModalTitle").innerText = heading; // Update the title of the results modal element (from the HTML)
+    document.getElementById("results-content").innerHTML = results; // Fill the content of the results modal element (from the HTML) with the message
+
+    resultsModal.show; // Display the results modal element (from the HTML) on the screen
+}
+
+
+
