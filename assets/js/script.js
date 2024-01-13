@@ -5,9 +5,25 @@ const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal")
 document.getElementById("status").addEventListener("click", e => getStatus(e));
 document.getElementById("submit").addEventListener("click", e => postForm(e)); //get the "submit" element from the html,
 
+//in order to change the options from returning as seperate values, we want them as a comma listed, so must process them first
+function processOptions(form) { //this function takes the form data, so we pass it into the function
+    
+    let optArray = []; //temporary array, so create an empty array
+    //'for' declares a loop, 'let' declares a variable to be named 'entry' here, "form.entries" form is an item and .entries is a method-call
+    for (let entry of form.entries()) {  //so we're iterating over the "form" object, each iteration is called "entry"
+        if (entry[0] === "options") { //if the first entry matches the string "options"...
+            optArray.push(entry[1]);//then we push the second value into our optArray
+        }
+    }
+    form.delete("options");//deletes all occurrences of "options" in our form data
+    form.append("options",optArray.join());//we'll now append our new options (optArray) using the join method, which by default provides strings as comma seperated
+    return form;
+}
+
+
 //The Post function
 async function postForm(e) { //function activates upon "e" (the event, from the event listener)?
-    const form = new FormData(document.getElementById("checksform")); //new const named "form", check the form element from html "checksform"
+    const form = processOptions(new FormData(document.getElementById("checksform"))); //new const named "form", check the form element from html "checksform" [processOptions; after creating, we want the processed options data passed into this function]
 
     //for (let entry of form.entries()) {
     //    console.log(entry); //use this to check in the console if the front end form is working, then replace to send to the API
