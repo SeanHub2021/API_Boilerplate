@@ -24,16 +24,34 @@ async function postForm(e) { //function activates upon "e" (the event, from the 
     
     const data = await response.json(); //create the new constant "data", await response(from the fetch statement earlier) and parse it as json first before adding to "data"
     
-    function displayErrors {
-        
-    }
-
     if (response.ok) { //check if the response is ok (http status code 200) ["ok" is code to check this]
-        console.log(data); //if okay, log the data to console
+        //console.log(data); //if okay, log the data to console.
+        displayErrors(data); //now that is confirmed as working, create function displayErrors [below], and pass it data
+    }
         else {
             throw new Error(data.error); //if not, "throw" an error message with the error from the api
         }
+}
+
+function displayErrors(data) { //function to display the errors
+    
+    let heading = `JSHint Results for ${data.file}`; //set the heading of the error message, insert the 'file' property from the 'data' object
+
+    if (data.total_errors ===0) {
+        results = `<div class="no_errors">No errors reported!</div>`;
+    } else {
+        results = `<div>Total Errors: <span class="error_count">${data.total_errors}</span>`;
+        for (let error of data.error_list) { //iterate through each of the errors
+            results += `<div>At line <span class="line">${error.line}</span></div>`;//report the line number
+            results += `column <span class="column">${error.col}</span></div>`;//report the column number, with JShint does
+            results += `<div class="error>${error.error}</div>`;//the error text thats coming back from the JSON
+        }
     }
+
+    document.getElementById("resultsModalTitle").innerText = heading; // Update the title of the results modal element (from the HTML)
+    document.getElementById("results-content").innerHTML = results; // Fill the content of the results modal element (from the HTML) with the message
+
+    resultsModal.show(); // Display the results modal element (from the HTML) on the screen
 }
 
 
@@ -66,7 +84,7 @@ function displayStatus(data) {
     document.getElementById("resultsModalTitle").innerText = heading; // Update the title of the results modal element (from the HTML)
     document.getElementById("results-content").innerHTML = results; // Fill the content of the results modal element (from the HTML) with the message
 
-    resultsModal.show; // Display the results modal element (from the HTML) on the screen
+    resultsModal.show(); // Display the results modal element (from the HTML) on the screen
 }
 
 
