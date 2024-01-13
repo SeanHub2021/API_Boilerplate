@@ -43,13 +43,15 @@ async function postForm(e) { //function activates upon "e" (the event, from the 
     if (response.ok) { //check if the response is ok (http status code 200) ["ok" is code to check this]
         //console.log(data); //if okay, log the data to console.
         displayErrors(data); //now that is confirmed as working, create function displayErrors [below], and pass it data
+    }   else {
+        displayException(data); //function to display the error to users, (added whilst writing the function down below)    
+        throw new Error(data.error); //if not, "throw" an error message with the error from the api
     }
-        else {
-            throw new Error(data.error); //if not, "throw" an error message with the error from the api
-        }
 }
+        
 
-function displayErrors(data) { //function to display the errors
+//DISPLAY the ERRORS
+function displayErrors(data) { 
     
     let heading = `JSHint Results for ${data.file}`; //set the heading of the error message, insert the 'file' property from the 'data' object
 
@@ -87,6 +89,7 @@ async function getStatus(e) {
         //console.log(data.expiry) // and then print the response!
         displayStatus(data);
     } else {
+        displayException(data); //function to display the error to users, (added whilst writing the function down below)
         throw new Error(data.error); //in the api documentation there is an error message for "error", here if the signal of "okay" is not returned, we return the data for "error"
     }
 }
@@ -103,5 +106,15 @@ function displayStatus(data) {
     resultsModal.show(); // Display the results modal element (from the HTML) on the screen
 }
 
+function displayException(data) {
+    let heading = `An Exception Occurred`;
 
+    results = `<div>The API returned status code ${data.status_code}</div`;
+    results += `<div>Error number: <strong>${data.error_no}</strong></div>`;
+    results += `<div>Error text: <strong>${data.error}</strong></div>`;
 
+    document.getElementById("resultsModalTitle").innerText = heading;
+    document.getElementById("results-content").innerHTML = results;
+
+    resultsModal.show();
+}
